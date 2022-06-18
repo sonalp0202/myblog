@@ -3,17 +3,10 @@ from .models import CustomUser
 from django import forms
 
 class RegisterUser(UserCreationForm):
+    mobile = forms.CharField()
     class Meta:
         model = CustomUser
-        fields = ['email','first_name','last_name']
-
-    def clean_email(self):
-        email = self.cleaned_data['email']
-        users = CustomUser.objects.filter(email__iexact=email)
-        if users:
-            raise forms.ValidationError("Custom text about email.")
-        return email.lower()
-
+        fields = ['email','first_name','last_name','mobile']
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:

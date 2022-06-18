@@ -15,6 +15,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=20,null=True,blank=True)
     bio = models.TextField(max_length=225,null=True,blank=True)
     verified = models.BooleanField(default=False)
+    mobile = models.PositiveBigIntegerField()
+    otp = models.CharField(max_length=100,default=None)
 
 
     USERNAME_FIELD = 'email'
@@ -27,4 +29,3 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def full_name(self):
         return self.first_name + self.last_name
-

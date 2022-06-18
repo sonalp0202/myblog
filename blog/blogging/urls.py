@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import registeruser,activate
+from .views import registeruserviaemail,activate
 
 
-urlpatterns = [path('register/',registeruser,name='register'),
+urlpatterns = [path('register/',registeruserviaemail,name='register'),
                path('activate/<uidb64>/<token>/',activate, name='activate')]

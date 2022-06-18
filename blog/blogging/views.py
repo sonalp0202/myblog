@@ -12,11 +12,10 @@ from django.core.mail import send_mail
 user = get_user_model()
 
 
-def registeruser(request):
+def registeruserviaemail(request):
     if request.method == 'POST':
         form = RegisterUser(request.POST)
         if form.is_valid():
-            # print(form.data)
             try:
                 if user.objects.filter(email=request.POST['email']).first():
                     messages.success(request, 'The email id is already present')
@@ -33,6 +32,7 @@ def registeruser(request):
                 uid64 = urlsafe_base64_encode(force_bytes(new_user.pk))
                 print(uid64)
                 print(new_user.pk)
+                new_user.otp = default_token_generator.make_token(new_user)
                 message = render_to_string('activate_email.html', {
                     'user': new_user,
                     'domain': current_site.domain,
@@ -43,10 +43,12 @@ def registeruser(request):
                 send_mail(mail_subject, message, None, [to_email], fail_silently=False)
                 messages.add_message(request, messages.SUCCESS, 'Profile created but  verification is required')
 
+
                 # return HttpResponse('Please confirm your email address to complete the registration')
             except Exception as e:
                 print(e)
-
+        else:
+            return render(request,'register_user.html',{'form': form})
     form = RegisterUser()
     return render(request, 'register_user.html', {'form': form})
 
@@ -56,7 +58,6 @@ def activate(request, uidb64, token):
     try:
         print(uidb64)
         uid = force_text(urlsafe_base64_decode(uidb64))
-        # uid = urlsafe_base64_decode(uidb64)
         print(uid)
         print(int(uid))
 
@@ -66,7 +67,7 @@ def activate(request, uidb64, token):
     print(nuser)
     print(token)
     print(default_token_generator.check_token(nuser, token))
-    if nuser is not None and default_token_generator.check_token(nuser, token):
+    if nuser is not None and (nuser.otp == token):
         nuser.is_active = True
         nuser.save()
         return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
